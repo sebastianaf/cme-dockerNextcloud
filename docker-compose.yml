@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  cme-nextcloud-app:
+    container_name: cme-nextcloud-app
+    image: nextcloud:latest
+    restart: always
+    volumes:
+      - ./nextcloud:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_HOST=cme-nextcloud-db
+    networks:
+      - cme-nextcloud
+    depends_on:
+      - cme-nextcloud-db
+
+  cme-nextcloud-db:
+    container_name: cme-nextcloud-db
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    image: mariadb:latest
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - cme-nextcloud
+
+  cme-nextcloud-phpmyadmin:
+    container_name: cme-nextcloud-phpmyadmin
+    restart: always
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=cme-nextcloud-db
+      - UPLOAD_LIMIT=200M
+    depends_on:
+      - cme-nextcloud-db
+    networks:
+      - cme-nextcloud
+
+networks:
+  cme-nextcloud:
+    name: cme-nextcloud
