@@ -16,6 +16,8 @@ services:
       - cme-nextcloud
     depends_on:
       - cme-nextcloud-db
+    ports:
+      - 9020:80
 
   cme-nextcloud-db:
     container_name: cme-nextcloud-db
@@ -43,6 +45,8 @@ services:
       - cme-nextcloud-db
     networks:
       - cme-nextcloud
+    ports:
+      - 9021:80
 
 networks:
   cme-nextcloud:
